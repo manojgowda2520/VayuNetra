@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 import re
 from dataclasses import asdict, dataclass
 
@@ -9,6 +10,8 @@ import boto3
 from botocore.exceptions import BotoCoreError, ClientError
 
 from app.config import settings
+
+logger = logging.getLogger("vayunetra")
 
 
 def _bedrock():
@@ -92,7 +95,8 @@ def analyze_pollution_photo(image_bytes: bytes, area: str = "Bengaluru") -> dict
         text = _extract_message_text(resp["body"].read())
         text = re.sub(r"```json\s*|\s*```", "", text).strip()
         return json.loads(extract_json_block(text))
-    except Exception:
+    except Exception as e:
+        logger.warning("Bedrock analyze_pollution_photo failed: %s", e)
         return _fallback_analysis_dict(area)
 
 
@@ -140,7 +144,8 @@ Return ONLY the letter text."""
             accept="application/json",
         )
         return _extract_message_text(resp["body"].read()).strip()
-    except Exception:
+    except Exception as e:
+        logger.warning("Bedrock generate_complaint_letter failed: %s", e)
         return _fallback_letter(area, severity, pollution_type, description, latitude, longitude)
 
 
