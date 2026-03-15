@@ -25,6 +25,9 @@ class Settings(BaseSettings):
     S3_BUCKET_NAME: str = "vayunetra-pollution-images"
     S3_REGION: str = "us-east-1"
 
+    # Amazon Bedrock — set to true to use Nova (Lite, Sonic, Embed)
+    USE_BEDROCK: bool = True
+
     # Nova model IDs
     NOVA_LITE_MODEL_ID: str = "us.amazon.nova-2-lite-v1:0"
     NOVA_SONIC_MODEL_ID: str = "amazon.nova-2-sonic-v1:0"
@@ -58,7 +61,12 @@ class Settings(BaseSettings):
 
     @property
     def use_bedrock(self) -> bool:
-        return bool(self.AWS_ACCESS_KEY_ID and self.AWS_SECRET_ACCESS_KEY and self.AWS_REGION)
+        return bool(
+            self.USE_BEDROCK
+            and self.AWS_ACCESS_KEY_ID
+            and self.AWS_SECRET_ACCESS_KEY
+            and self.AWS_REGION
+        )
 
     @property
     def debug(self) -> bool:

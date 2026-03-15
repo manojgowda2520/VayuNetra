@@ -2,10 +2,13 @@ from __future__ import annotations
 
 import base64
 import json
+import logging
 
 import boto3
 
 from app.config import settings
+
+logger = logging.getLogger("vayunetra")
 
 
 def _bedrock():
@@ -60,7 +63,8 @@ def transcribe_voice(audio_bytes: bytes, language: str = "en") -> dict:
         decoded = json.loads(resp["body"].read().decode("utf-8"))
         transcription = decoded["output"]["message"]["content"][0]["text"].strip()
         return {"transcription": transcription, "language": normalized_language, "confidence": 0.92}
-    except Exception:
+    except Exception as e:
+        logger.warning("Bedrock Nova Sonic transcribe_voice failed: %s", e)
         transcript = _fallback_transcript(normalized_language)
         return {"transcription": transcript, "language": normalized_language, "confidence": 0.8}
 
