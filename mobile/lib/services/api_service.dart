@@ -66,8 +66,10 @@ class ApiService {
     req.fields['longitude'] = lng.toString();
     req.fields['description'] = description;
     req.files.add(await http.MultipartFile.fromPath('photo', photoPath));
-    final streamedResponse = await req.send().timeout(const Duration(seconds: 30));
-    final res = await http.Response.fromStream(streamedResponse);
+    final streamedResponse = await req.send()
+        .timeout(const Duration(seconds: 60));
+    final res = await http.Response.fromStream(streamedResponse)
+        .timeout(const Duration(seconds: 60));
 
     // Debug: print status and first 200 chars
     print('Report response status: ${res.statusCode}');

@@ -19,9 +19,7 @@ class ChatBubble extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (!isUser) ...[
-                Container(width: 32, height: 32,
-                  decoration: BoxDecoration(shape: BoxShape.circle, color: VNColors.cyan.withOpacity(0.15), border: Border.all(color: VNColors.cyan)),
-                  child: const Icon(Icons.visibility, color: VNColors.cyan, size: 16)),
+                Image.asset('assets/images/logo.png', width: 40, height: 40, fit: BoxFit.contain),
                 const SizedBox(width: 8),
               ],
               Flexible(child: Container(

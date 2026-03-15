@@ -95,7 +95,7 @@ class _ChatScreenState extends State<ChatScreen> {
       body: Column(children: [
         Expanded(child: Consumer<ChatProvider>(builder: (_, chat, __) {
           if (chat.messages.isEmpty) return Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            const Icon(Icons.visibility, color: VNColors.cyan, size: 48),
+            Image.asset('assets/images/logo.png', width: 72, height: 72, fit: BoxFit.contain),
             const SizedBox(height: 12),
             Text(context.t('askAirQuality'), style: const TextStyle(fontFamily: 'Rajdhani', fontSize: 18, color: VNColors.text)),
             const SizedBox(height: 24),

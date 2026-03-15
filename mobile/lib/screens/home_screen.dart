@@ -39,9 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         backgroundColor: VNColors.bg,
         title: Row(children: [
-          Container(width: 32, height: 32,
-            decoration: BoxDecoration(shape: BoxShape.circle, color: VNColors.cyan.withOpacity(0.1), border: Border.all(color: VNColors.cyan)),
-            child: const Icon(Icons.visibility, color: VNColors.cyan, size: 18)),
+          Image.asset('assets/images/logo.png', width: 40, height: 40, fit: BoxFit.contain),
           const SizedBox(width: 8),
           Text(user != null ? 'Hey, ${user.name.split(' ').first}!' : 'VayuNetra',
             style: const TextStyle(fontFamily: 'Rajdhani', fontSize: 20, color: VNColors.text)),

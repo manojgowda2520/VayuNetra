@@ -10,12 +10,10 @@ class VNLoadingWidget extends StatelessWidget {
   @override
   Widget build(BuildContext context) => Center(
     child: Column(mainAxisSize: MainAxisSize.min, children: [
-      Pulse(infinite: true, child: Container(
-        width: 64, height: 64,
-        decoration: BoxDecoration(shape: BoxShape.circle,
-          color: VNColors.cyan.withOpacity(0.15), border: Border.all(color: VNColors.cyan, width: 2)),
-        child: const Icon(Icons.visibility, color: VNColors.cyan, size: 32),
-      )),
+      Pulse(
+        infinite: true,
+        child: Image.asset('assets/images/logo.png', width: 80, height: 80, fit: BoxFit.contain),
+      ),
       const SizedBox(height: 16),
       Text(message ?? context.t('loading'), style: const TextStyle(fontFamily: 'DMSans', color: VNColors.muted, fontSize: 14)),
       const SizedBox(height: 12),

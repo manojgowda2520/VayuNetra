@@ -693,9 +693,9 @@ class _ReportScreenState extends State<ReportScreen> {
             ),
             child: Column(children: [
               Pulse(
-                  infinite: true,
-                  child: const Icon(Icons.visibility,
-                      color: VNColors.cyan, size: 48)),
+                infinite: true,
+                child: Image.asset('assets/images/logo.png', width: 72, height: 72, fit: BoxFit.contain),
+              ),
               const SizedBox(height: 12),
               const Text('Nova 2 Lite Analyzing...',
                   style: TextStyle(

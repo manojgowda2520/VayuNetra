@@ -54,7 +54,7 @@ class _LoginScreenState extends State<LoginScreen> {
             const SizedBox(height: 40),
             FadeInDown(
               child: Column(children: [
-                Image.asset('assets/images/logo.png', width: 80, height: 80, fit: BoxFit.contain),
+                Image.asset('assets/images/logo.png', width: 100, height: 100, fit: BoxFit.contain),
                 const SizedBox(height: 12),
                 const Text('VayuNetra', style: TextStyle(fontFamily: 'Rajdhani', fontSize: 32, fontWeight: FontWeight.bold, color: VNColors.cyan)),
                 Text(context.t('appSubtitleNative'), style: const TextStyle(fontFamily: 'Rajdhani', fontSize: 16, color: VNColors.purple, fontStyle: FontStyle.italic)),
