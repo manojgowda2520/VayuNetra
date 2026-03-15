@@ -61,17 +61,15 @@ class _SplashScreenState extends State<SplashScreen> {
         ),
         child: Center(
           child: Column(mainAxisAlignment: MainAxisAlignment.center, children: [
-            FadeInDown(child: Container(
-              width: 110, height: 110,
-              decoration: BoxDecoration(
-                shape: BoxShape.circle,
-                color: VNColors.cyan.withOpacity(0.12),
-                border: Border.all(color: VNColors.cyan, width: 2),
-                boxShadow: [BoxShadow(color: VNColors.cyan.withOpacity(0.35), blurRadius: 40)],
+            FadeInDown(
+              child: Image.asset(
+                'assets/images/logo.png',
+                width: 140,
+                height: 140,
+                fit: BoxFit.contain,
               ),
-              child: const Icon(Icons.visibility, color: VNColors.cyan, size: 54),
-            )),
-            const SizedBox(height: 24),
+            ),
+            const SizedBox(height: 20),
             FadeInUp(delay: const Duration(milliseconds: 300),
               child: const Text('VayuNetra', style: TextStyle(fontFamily: 'Rajdhani', fontSize: 48, fontWeight: FontWeight.bold, color: VNColors.cyan, letterSpacing: 2))),
             FadeInUp(delay: const Duration(milliseconds: 450),
