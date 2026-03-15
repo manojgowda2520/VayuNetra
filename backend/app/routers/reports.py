@@ -87,19 +87,13 @@ async def submit_report(
         status=ReportStatusEnum.analyzing,
         report_date=datetime.utcnow(),
     )
-    db.add(report); db.commit(); db.refresh(report)
+    db.add(report)
+    db.commit()
+    db.refresh(report)
 
+    # 1. Analyze pollution only (no complaint yet)
     analysis_data = analyze_pollution_photo(photo_bytes, area)
-    severity = analysis_data.get("severity", "MODERATE")
-
-    complaint = generate_complaint_letter(
-        area=area,
-        severity=severity,
-        pollution_type=analysis_data.get("pollution_type", "Air Pollution"),
-        description=analysis_data.get("description", ""),
-        latitude=latitude,
-        longitude=longitude,
-    )
+    severity = (analysis_data.get("severity") or "MODERATE").upper()
 
     try:
         img_embedding = generate_image_embedding(photo_bytes)
@@ -108,6 +102,7 @@ async def submit_report(
         img_embedding = None
         loc_embedding = None
 
+    # 2. Save report + analysis (pollution shown); complaint_letter left empty
     analysis = AnalysisResult(
         report_id=report.report_id,
         analyzed_date=datetime.utcnow(),
@@ -119,7 +114,7 @@ async def submit_report(
         full_description=analysis_data.get("description"),
         health_risk=analysis_data.get("health_risk"),
         recommendations=analysis_data.get("recommendations"),
-        complaint_letter=complaint,
+        complaint_letter=None,
         processed_by="us.amazon.nova-2-lite-v1:0 + amazon.nova-2-multimodal-embeddings-v1:0",
         image_embedding=img_embedding,
         location_embedding=loc_embedding,
@@ -136,7 +131,22 @@ async def submit_report(
         )
     )
     report.status = ReportStatusEnum.analyzed
-    db.commit(); db.refresh(report)
+    db.commit()
+    db.refresh(analysis)
+
+    # 3. Generate complaint only after report exists, and only for MODERATE / HIGH / CRITICAL
+    if severity in ("MODERATE", "HIGH", "CRITICAL"):
+        complaint = generate_complaint_letter(
+            area=area,
+            severity=severity,
+            pollution_type=analysis_data.get("pollution_type", "Air Pollution"),
+            description=analysis_data.get("description", ""),
+            latitude=latitude,
+            longitude=longitude,
+        )
+        analysis.complaint_letter = complaint
+        db.commit()
+        db.refresh(report)
 
     if current_user:
         _update_user(current_user, severity, db)

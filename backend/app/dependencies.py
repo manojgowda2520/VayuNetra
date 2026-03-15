@@ -22,7 +22,7 @@ def get_current_user(
     if not payload:
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     try:
-        user_id = int(payload.get("sub"))
+        user_id = int(payload.get("sub"))  # must be int for PostgreSQL (integer = varchar fails)
     except (TypeError, ValueError):
         raise HTTPException(status_code=401, detail="Invalid or expired token")
     user = db.query(User).filter(User.user_id == user_id).first()
@@ -41,7 +41,7 @@ def get_optional_user(
     if not payload:
         return None
     try:
-        user_id = int(payload.get("sub"))
+        user_id = int(payload.get("sub"))  # must be int for PostgreSQL (integer = varchar fails)
     except (TypeError, ValueError):
         return None
     return db.query(User).filter(User.user_id == user_id).first()

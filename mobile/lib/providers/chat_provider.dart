@@ -1,5 +1,10 @@
-import 'package:flutter/material.dart';
 import 'dart:async';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'package:record/record.dart';
+
 import '../services/api_service.dart';
 
 class ChatMessage {
@@ -14,10 +19,22 @@ class ChatMessage {
 
 class ChatProvider extends ChangeNotifier {
   final List<ChatMessage> _messages = [];
+  final AudioRecorder _recorder = AudioRecorder();
   bool _loading = false;
+  bool _voiceMode = false;
+  bool _recording = false;
+  bool _transcribing = false;
 
   List<ChatMessage> get messages => _messages;
   bool get loading => _loading;
+  bool get voiceMode => _voiceMode;
+  bool get recording => _recording;
+  bool get transcribing => _transcribing;
+
+  void toggleVoiceMode() {
+    _voiceMode = !_voiceMode;
+    notifyListeners();
+  }
 
   Future<void> sendMessage(String text) async {
     _messages.add(ChatMessage(role: 'user', content: text));
@@ -39,6 +56,67 @@ class ChatProvider extends ChangeNotifier {
       ));
     }
     _loading = false; notifyListeners();
+  }
+
+  Future<bool> startRecording() async {
+    if (!await _recorder.hasPermission()) return false;
+    final tempDir = await getTemporaryDirectory();
+    final path = '${tempDir.path}/vayunetra-chat-${DateTime.now().millisecondsSinceEpoch}.wav';
+    await _recorder.start(
+      const RecordConfig(
+        encoder: AudioEncoder.wav,
+        sampleRate: 16000,
+        numChannels: 1,
+      ),
+      path: path,
+    );
+    _recording = true;
+    notifyListeners();
+    return true;
+  }
+
+  Future<bool> stopRecordingAndSend(String languageCode) async {
+    if (!_recording) return false;
+    _recording = false;
+    _transcribing = true;
+    notifyListeners();
+
+    final path = await _recorder.stop();
+    if (path == null) {
+      _transcribing = false;
+      notifyListeners();
+      return false;
+    }
+
+    try {
+      final res = await ApiService.transcribeVoice(path, languageCode)
+          .timeout(const Duration(seconds: 20));
+      final transcript = (res['transcription'] ?? '').toString().trim();
+      _transcribing = false;
+      notifyListeners();
+      if (transcript.isEmpty) return false;
+      await sendMessage(transcript);
+      return true;
+    } catch (_) {
+      _transcribing = false;
+      notifyListeners();
+      return false;
+    } finally {
+      unawaited(File(path).delete().catchError((_) {}));
+    }
+  }
+
+  Future<void> cancelRecording() async {
+    if (!_recording) return;
+    await _recorder.stop();
+    _recording = false;
+    notifyListeners();
+  }
+
+  @override
+  void dispose() {
+    _recorder.dispose();
+    super.dispose();
   }
 
   void clear() { _messages.clear(); notifyListeners(); }

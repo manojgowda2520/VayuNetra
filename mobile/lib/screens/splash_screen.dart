@@ -5,6 +5,7 @@ import '../config/theme.dart';
 import '../config/constants.dart';
 import '../providers/auth_provider.dart';
 import '../providers/language_provider.dart';
+import '../services/api_service.dart';
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -26,6 +27,13 @@ class _SplashScreenState extends State<SplashScreen> {
     await Future.delayed(const Duration(milliseconds: 350));
     if (mounted) {
       setState(() => _status = context.read<LanguageProvider>().t('loadingInsights'));
+    }
+    if (!mounted) return;
+    try {
+      final result = await ApiService.health();
+      print('Health: $result');
+    } catch (e) {
+      print('Health check failed: $e');
     }
     if (!mounted) return;
     final auth = context.read<AuthProvider>();

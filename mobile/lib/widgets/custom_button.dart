@@ -32,11 +32,12 @@ class VNButton extends StatelessWidget {
             ? const Center(child: SizedBox(width: 20, height: 20,
                 child: CircularProgressIndicator(color: Colors.white, strokeWidth: 2)))
             : Row(
+                mainAxisSize: MainAxisSize.min,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   if (icon != null) ...[Icon(icon, color: outlined ? c : Colors.white, size: 18), const SizedBox(width: 8)],
-                  Text(label, style: TextStyle(fontFamily: 'Rajdhani', fontWeight: FontWeight.bold,
-                    fontSize: 16, color: outlined ? c : Colors.white, letterSpacing: 0.5)),
+                  Flexible(child: FittedBox(fit: BoxFit.scaleDown, child: Text(label, maxLines: 1, overflow: TextOverflow.ellipsis, style: TextStyle(fontFamily: 'Rajdhani', fontWeight: FontWeight.bold,
+                    fontSize: 16, color: outlined ? c : Colors.white, letterSpacing: 0.5)))),
                 ],
               ),
       ),

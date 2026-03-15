@@ -1,7 +1,30 @@
 import 'package:flutter/material.dart';
 import 'dart:async';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+import '../config/constants.dart';
 import '../models/report.dart';
 import '../services/api_service.dart';
+
+// #region agent log
+void _debugLog(String location, String message, Map<String, dynamic> data, String hypothesisId) {
+  final payload = {
+    'sessionId': '478213',
+    'runId': 'run1',
+    'hypothesisId': hypothesisId,
+    'location': location,
+    'message': message,
+    'data': data,
+    'timestamp': DateTime.now().millisecondsSinceEpoch,
+  };
+  debugPrint('DEBUG $hypothesisId: $message ${jsonEncode(data)}');
+  http.post(
+    Uri.parse('http://127.0.0.1:7516/ingest/ef0eaa7e-adf7-4eab-9a4c-6c0f0831b6b0'),
+    headers: {'Content-Type': 'application/json', 'X-Debug-Session-Id': '478213'},
+    body: jsonEncode(payload),
+  ).catchError((_) => http.Response('', 500));
+}
+// #endregion
 
 class ReportProvider extends ChangeNotifier {
   List<Report> _reports = [];
@@ -16,95 +39,31 @@ class ReportProvider extends ChangeNotifier {
   bool get loading => _loading;
   String? get error => _error;
 
-  List<Report> _demoReports() {
-    final now = DateTime.now();
-    return [
-      Report(
-        id: 101,
-        userId: 1,
-        area: 'Silk Board Junction',
-        latitude: 12.9177,
-        longitude: 77.6238,
-        description: 'Heavy traffic smoke during peak hours.',
-        photoUrl: null,
-        status: 'reviewed',
-        createdAt: now.subtract(const Duration(minutes: 40)),
-        analysis: AnalysisResult(
-          severity: 'HIGH',
-          pollutionType: 'Vehicle Emissions',
-          healthRisk: 'Sensitive groups may feel irritation and breathing discomfort.',
-          description: 'Dense roadside emissions and repeated signal congestion are affecting local air quality.',
-          confidence: 0.91,
-          recommendations: ['Avoid long exposure during rush hour', 'Use a mask if commuting daily'],
-          complaintLetter: '',
-        ),
-      ),
-      Report(
-        id: 102,
-        userId: 1,
-        area: 'Whitefield Main Road',
-        latitude: 12.9698,
-        longitude: 77.7500,
-        description: 'Dust near construction stretch.',
-        photoUrl: null,
-        status: 'reviewed',
-        createdAt: now.subtract(const Duration(hours: 3)),
-        analysis: AnalysisResult(
-          severity: 'MODERATE',
-          pollutionType: 'Construction Dust',
-          healthRisk: 'Can trigger mild throat and eye irritation nearby.',
-          description: 'Open debris and active construction appear to be causing particulate dust in the area.',
-          confidence: 0.86,
-          recommendations: ['Reduce outdoor exposure nearby', 'Report uncovered debris to local authorities'],
-          complaintLetter: '',
-        ),
-      ),
-      Report(
-        id: 103,
-        userId: 2,
-        area: 'Koramangala 5th Block',
-        latitude: 12.9352,
-        longitude: 77.6245,
-        description: 'Open waste burning spotted near roadside.',
-        photoUrl: null,
-        status: 'critical',
-        createdAt: now.subtract(const Duration(hours: 7)),
-        analysis: AnalysisResult(
-          severity: 'CRITICAL',
-          pollutionType: 'Open Waste Burning',
-          healthRisk: 'Smoke may cause acute breathing discomfort and eye irritation.',
-          description: 'Visible smoke plume and burning waste indicate severe local air quality impact.',
-          confidence: 0.95,
-          recommendations: ['Move away from the smoke source', 'Escalate the report to the municipality immediately'],
-          complaintLetter: '',
-        ),
-      ),
-    ];
+  void clearError() {
+    _error = null;
+    notifyListeners();
   }
 
   Future<void> fetchReports({String? area}) async {
-    _loading = true; notifyListeners();
+    _loading = true; _error = null; notifyListeners();
     try {
-      final d = await ApiService.getReports(area: area).timeout(const Duration(milliseconds: 1200));
+      final d = await ApiService.getReports(area: area).timeout(const Duration(seconds: 15));
       _reports = d.map((e) => Report.fromJson(e)).toList();
     } catch (e) {
-      final fallback = _demoReports();
-      _reports = area == null
-          ? fallback
-          : fallback.where((r) => r.area.toLowerCase().contains(area.toLowerCase())).toList();
-      _error = null;
+      _reports = [];
+      _error = 'Could not load reports. Please check your connection.';
     }
     _loading = false; notifyListeners();
   }
 
   Future<void> fetchMyReports() async {
-    _loading = true; notifyListeners();
+    _loading = true; _error = null; notifyListeners();
     try {
-      final d = await ApiService.getMyReports().timeout(const Duration(milliseconds: 1200));
+      final d = await ApiService.getMyReports().timeout(const Duration(seconds: 15));
       _myReports = d.map((e) => Report.fromJson(e)).toList();
     } catch (e) {
-      _myReports = _demoReports().where((r) => r.userId == 1).toList();
-      _error = null;
+      _myReports = [];
+      _error = 'Could not load your reports. Please check your connection.';
     }
     _loading = false; notifyListeners();
   }
@@ -114,9 +73,17 @@ class ReportProvider extends ChangeNotifier {
     required double lat, required double lng, required String description,
   }) async {
     _loading = true; _error = null; notifyListeners();
+    // #region agent log
+    final baseUrl = AppConstants.apiBaseUrl;
+    _debugLog('report_provider.dart:submitReport', 'submitReport started', {'baseUrl': baseUrl}, 'A');
+    // #endregion
     try {
       final res = await ApiService.submitReport(
-        photoPath: photoPath, area: area, lat: lat, lng: lng, description: description);
+        photoPath: photoPath, area: area, lat: lat, lng: lng, description: description,
+      ).timeout(const Duration(seconds: 60));
+      // #region agent log
+      _debugLog('report_provider.dart:submitReport', 'submitReport response', {'hasId': res['id'] != null, 'keys': res.keys.toList().toString()}, 'E');
+      // #endregion
       if (res['id'] != null) {
         _lastSubmitted = Report.fromJson(res);
         _myReports = [_lastSubmitted!, ..._myReports];
@@ -124,29 +91,15 @@ class ReportProvider extends ChangeNotifier {
         return _lastSubmitted;
       }
       _error = res['detail'] ?? 'Submission failed';
-    } catch (e) {
-      _lastSubmitted = Report(
-        id: DateTime.now().millisecondsSinceEpoch,
-        userId: 1,
-        area: area,
-        latitude: lat,
-        longitude: lng,
-        description: description,
-        photoUrl: null,
-        status: 'reviewed',
-        createdAt: DateTime.now(),
-        analysis: AnalysisResult(
-          severity: 'MODERATE',
-          pollutionType: 'Air Quality Alert',
-          healthRisk: 'Moderate local exposure may cause irritation for sensitive groups.',
-          description: 'This is a local demo analysis generated because the backend is not connected yet.',
-          confidence: 0.82,
-          recommendations: ['Avoid the hotspot for extended periods', 'Track whether smoke or dust persists'],
-          complaintLetter: '',
-        ),
-      );
-      _myReports = [_lastSubmitted!, ..._myReports];
-      _error = null;
+    } catch (e, stack) {
+      // #region agent log
+      _debugLog('report_provider.dart:submitReport', 'submitReport catch', {'error': e.toString(), 'type': e.runtimeType.toString(), 'stackTrace': stack.toString().split('\n').take(3).join(' ')}, 'B');
+      // #endregion
+      _lastSubmitted = null;
+      final msg = e.toString();
+      _error = msg.contains('TimeoutException') || msg.contains('timeout')
+          ? 'Request timed out. The server may be busy. Please try again.'
+          : 'Submission failed. Please check your connection and try again.';
     }
     _loading = false; notifyListeners();
     return null;

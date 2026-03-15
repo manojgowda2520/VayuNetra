@@ -48,6 +48,17 @@ class TokenResponse(BaseModel):
     user: UserOut
 
 
+def _severity_to_aqi(severity: str) -> tuple[str, str]:
+    """Map severity to (estimated_aqi_impact, estimated_aqi_range)."""
+    s = (severity or "MODERATE").upper()
+    return {
+        "CRITICAL": ("Severe", "201+"),
+        "HIGH": ("High", "101–200"),
+        "MODERATE": ("Moderate", "51–100"),
+        "LOW": ("Low", "0–50"),
+    }.get(s, ("Moderate", "51–100"))
+
+
 class AnalysisOut(BaseModel):
     severity: str
     pollution_type: str
@@ -56,6 +67,8 @@ class AnalysisOut(BaseModel):
     confidence: float
     recommendations: List[str]
     complaint_letter: str
+    estimated_aqi_impact: str = "Moderate"
+    estimated_aqi_range: str = "51–100"
 
 
 class ReportOut(BaseModel):
@@ -77,6 +90,7 @@ class ReportOut(BaseModel):
         if report.analysis:
             analysis_obj = report.analysis
             severity = analysis_obj.severity.value if getattr(analysis_obj, "severity", None) else "MODERATE"
+            aqi_impact, aqi_range = _severity_to_aqi(severity)
             resolved_pollution_type = analysis_obj.pollution_type
             pollution_type = resolved_pollution_type or analysis_obj.analysis_notes or "Unknown"
             analysis = AnalysisOut(
@@ -87,6 +101,8 @@ class ReportOut(BaseModel):
                 confidence=analysis_obj.confidence_score or 0.8,
                 recommendations=analysis_obj.recommendations or [],
                 complaint_letter=analysis_obj.complaint_letter or "",
+                estimated_aqi_impact=aqi_impact,
+                estimated_aqi_range=aqi_range,
             )
         status = report.status.value if getattr(report.status, "value", None) else str(report.status or "analyzed")
         return cls(

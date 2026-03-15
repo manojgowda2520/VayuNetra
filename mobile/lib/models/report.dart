@@ -6,6 +6,8 @@ class AnalysisResult {
   final double confidence;
   final List<String> recommendations;
   final String complaintLetter;
+  final String estimatedAqiImpact;
+  final String estimatedAqiRange;
 
   AnalysisResult({
     required this.severity,
@@ -15,16 +17,20 @@ class AnalysisResult {
     required this.confidence,
     required this.recommendations,
     required this.complaintLetter,
+    this.estimatedAqiImpact = 'Moderate',
+    this.estimatedAqiRange = '51–100',
   });
 
   factory AnalysisResult.fromJson(Map<String, dynamic> j) => AnalysisResult(
-    severity:        j['severity'] ?? 'MODERATE',
-    pollutionType:   j['pollution_type'] ?? 'Unknown',
-    healthRisk:      j['health_risk'] ?? '',
-    description:     j['description'] ?? '',
-    confidence:      (j['confidence'] ?? 0.8).toDouble(),
-    recommendations: List<String>.from(j['recommendations'] ?? []),
-    complaintLetter: j['complaint_letter'] ?? '',
+    severity:            j['severity'] ?? 'MODERATE',
+    pollutionType:       j['pollution_type'] ?? 'Unknown',
+    healthRisk:          j['health_risk'] ?? '',
+    description:         j['description'] ?? '',
+    confidence:          (j['confidence'] ?? 0.8).toDouble(),
+    recommendations:    List<String>.from(j['recommendations'] ?? []),
+    complaintLetter:     j['complaint_letter'] ?? '',
+    estimatedAqiImpact:  j['estimated_aqi_impact'] ?? 'Moderate',
+    estimatedAqiRange:   j['estimated_aqi_range'] ?? '51–100',
   );
 }
 
@@ -54,15 +60,17 @@ class Report {
   });
 
   factory Report.fromJson(Map<String, dynamic> j) => Report(
-    id:          j['id'],
+    id:          j['id'] ?? j['report_id'] ?? 0,
     userId:      j['user_id'],
     area:        j['area'] ?? '',
     latitude:    (j['latitude'] ?? 0.0).toDouble(),
     longitude:   (j['longitude'] ?? 0.0).toDouble(),
     description: j['description'],
     photoUrl:    j['photo_url'],
-    status:      j['status'] ?? 'pending',
+    status:      j['status'] ?? 'analyzed',
     createdAt:   DateTime.tryParse(j['created_at'] ?? '') ?? DateTime.now(),
-    analysis:    j['analysis'] != null ? AnalysisResult.fromJson(j['analysis']) : null,
+    analysis:    j['analysis'] != null
+                   ? AnalysisResult.fromJson(j['analysis'])
+                   : null,
   );
 }

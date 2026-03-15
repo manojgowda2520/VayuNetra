@@ -18,8 +18,8 @@ class User {
   });
 
   factory User.fromJson(Map<String, dynamic> j) => User(
-    id:          j['id'],
-    name:        j['name'] ?? '',
+    id:          j['user_id'] ?? j['id'] ?? 0,
+    name:        j['username'] ?? j['name'] ?? '',
     email:       j['email'] ?? '',
     points:      j['points'] ?? 0,
     badgeLevel:  j['badge_level'] ?? 'Bronze Guardian',

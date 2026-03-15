@@ -30,8 +30,8 @@ class Settings(BaseSettings):
 
     # Nova model IDs
     NOVA_LITE_MODEL_ID: str = "us.amazon.nova-2-lite-v1:0"
-    NOVA_SONIC_MODEL_ID: str = "amazon.nova-2-sonic-v1:0"
-    NOVA_EMBED_MODEL_ID: str = "amazon.nova-2-multimodal-embeddings-v1:0"
+    NOVA_SONIC_MODEL_ID: str = "us.amazon.nova-2-sonic-v1:0"
+    NOVA_EMBED_MODEL_ID: str = "us.amazon.nova-2-multimodal-embeddings-v1:0"
 
     # Database
     DATABASE_URL: str = "sqlite:///./vayunetra.db"

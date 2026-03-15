@@ -1,8 +1,10 @@
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 
 class AppConstants {
+  /// Base URL for the API. Loaded from .env.development (see main.dart: dotenv.load(fileName: '.env.development')).
+  /// Key: API_BASE_URL. Fallback: https://api.vayunetra.com
   static String get apiBaseUrl =>
-      dotenv.env['API_BASE_URL'] ?? 'http://10.0.2.2:8000';
+      dotenv.env['API_BASE_URL'] ?? 'https://api.vayunetra.com';
 
   static const String splash      = '/';
   static const String login       = '/login';
