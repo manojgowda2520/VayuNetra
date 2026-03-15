@@ -4,6 +4,7 @@ from datetime import datetime
 from typing import List, Optional
 
 from fastapi import APIRouter, Depends, File, Form, HTTPException, Request, UploadFile
+from fastapi.responses import JSONResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -49,7 +50,7 @@ def _update_user(user: User, severity: str, db: Session):
     db.commit()
 
 
-@router.post("/reports", response_model=ReportOut)
+@router.post("/reports", response_model=ReportOut, response_class=JSONResponse)
 async def submit_report(
     request: Request,
     area: str = Form(...),
