@@ -192,34 +192,37 @@ class Report(Base):
 
 class AnalysisResult(Base):
     """
-    AI analysis results from Nova Lite + Nova Embed Image.
-    VECTOR(1024) columns are enabled on Postgres and fall back to JSON elsewhere.
+    AI analysis results from Nova 2 Lite + Nova Embed Image.
+    VECTOR(1024) columns for semantic similarity search.
     """
-
     __tablename__ = "analysis_results"
 
-    analysis_id = Column(Integer, primary_key=True, autoincrement=True)
-    report_id = Column(Integer, ForeignKey("reports.report_id"), unique=True)
+    analysis_id       = Column(Integer, primary_key=True, autoincrement=True)
+    report_id         = Column(Integer, ForeignKey("reports.report_id"), unique=True)
     pollution_type_id = Column(Integer, ForeignKey("pollution_types.pollution_type_id"), nullable=True)
-    analyzed_date = Column(DateTime(timezone=True), server_default=func.now())
-    confidence_score = Column(Float, nullable=True)
-    severity_score = Column(Integer, nullable=True)
-    severity = Column(Enum(SeverityEnum), nullable=True)
-    priority_level = Column(Enum(PriorityEnum), nullable=True)
-    analysis_notes = Column(Text, nullable=True)
-    full_description = Column(Text, nullable=True)
-    health_risk = Column(Text, nullable=True)
-    recommendations = Column(JSON, nullable=True)
-    complaint_letter = Column(Text, nullable=True)
-    processed_by = Column(String(80), default="us.amazon.nova-2-lite-v1:0")
-    image_embedding = Column(VectorColumn, nullable=True)
+    analyzed_date     = Column(DateTime(timezone=True), server_default=func.now())
+    confidence_score  = Column(Float, nullable=True)
+    severity_score    = Column(Integer, nullable=True)
+    severity          = Column(Enum(SeverityEnum), nullable=True)
+    priority_level    = Column(Enum(PriorityEnum), nullable=True)
+    analysis_notes    = Column(Text, nullable=True)        # was VARCHAR(50) — now TEXT
+    full_description  = Column(Text, nullable=True)        # TEXT for long Nova output
+    health_risk       = Column(Text, nullable=True)        # TEXT for long Nova output
+    recommendations   = Column(JSON, nullable=True)
+    complaint_letter  = Column(Text, nullable=True)        # TEXT — complaint is 2000+ chars
+    processed_by      = Column(String(200), default="amazon.nova-lite-v1:0")  # was VARCHAR(50)
+
+    # VECTOR(1024) — Nova Multimodal Embeddings
+    image_embedding    = Column(VectorColumn, nullable=True)
     location_embedding = Column(VectorColumn, nullable=True)
 
-    report = relationship("Report", back_populates="analysis")
+    report             = relationship("Report", back_populates="analysis")
     primary_pollution_type = relationship("PollutionType", foreign_keys=[pollution_type_id])
-    pollution_types = relationship("ReportPollutionType", back_populates="analysis")
+    pollution_types   = relationship("ReportPollutionType", back_populates="analysis")
 
-    __table_args__ = (Index("idx_analysis_date", "analyzed_date"),)
+    __table_args__ = (
+        Index("idx_analysis_date", "analyzed_date"),
+    )
 
     id = synonym("analysis_id")
     confidence = synonym("confidence_score")
