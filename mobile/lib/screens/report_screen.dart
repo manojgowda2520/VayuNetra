@@ -847,7 +847,7 @@ class _ReportScreenState extends State<ReportScreen> {
                   outlined: true,
                   icon: Icons.list,
                   onTap: () => Navigator.pushNamed(
-                      context, AppConstants.myReports)),
+                      context, AppConstants.myReports),
                 ),
               ),
               const SizedBox(width: 10),
