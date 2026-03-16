@@ -24,6 +24,7 @@ from app.models import (  # noqa: E402
     HazardLevelEnum,
     Location,
     PollutionType,
+    User,
 )
 
 
@@ -245,6 +246,26 @@ def seed_admin(db) -> None:
         print("Admin already exists")
 
 
+def seed_test_user(db) -> None:
+    """Seed demo/test user for docs and mobile app: test@vayunetra.com / Test@1234"""
+    test_email = "test@vayunetra.com"
+    if not db.query(User).filter(User.email == test_email).first():
+        db.add(
+            User(
+                username="test_user",
+                email=test_email,
+                password_hash=pwd_context.hash("Test@1234"),
+                points=0,
+                badge_level="Bronze Guardian",
+                report_count=0,
+            )
+        )
+        db.commit()
+        print("Seeded test user (test@vayunetra.com / Test@1234)")
+    else:
+        print("Test user already exists")
+
+
 if __name__ == "__main__":
     db = SessionLocal()
     try:
@@ -258,6 +279,7 @@ if __name__ == "__main__":
         seed_bengaluru_locations(db)
         seed_clean_zones(db)
         seed_admin(db)
+        seed_test_user(db)
         print("VayuNetra database ready")
     finally:
         db.close()

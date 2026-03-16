@@ -44,7 +44,7 @@ class ChatProvider extends ChangeNotifier {
           .map((m) => {'role': m.role, 'content': m.content})
           .toList();
       final res = await ApiService.chat(text, history.cast<Map<String, String>>())
-          .timeout(const Duration(milliseconds: 1200));
+          .timeout(const Duration(seconds: 30));
       final reply = res['response'] ?? res['message'] ?? 'No response';
       final tools = List<String>.from(res['tools_used'] ?? []);
       _messages.add(ChatMessage(role: 'assistant', content: reply, toolsUsed: tools));

@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Download VayuNetra – Report Pollution. Protect Bengaluru.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --primary: #00B4FF;
+      --primary-hover: #0091CC;
+      --secondary: #1565C0;
+      --bg: #020B18;
+      --card-bg: #0A1628;
+      --text: #E0F7FA;
+      --text-muted: #81D4FA;
+      --border: rgba(0, 180, 255, 0.15);
+      --navbar-bg: rgba(2, 11, 24, 0.92);
+    }
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+    }
+    a { color: var(--primary); text-decoration: none; }
+    a:hover { text-decoration: underline; }
+
+    .navbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 1rem 1.5rem;
+      background: var(--navbar-bg);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .navbar-brand img { height: 36px; width: auto; }
+    .navbar-brand-text .name { font-weight: 700; font-size: 1.1rem; }
+    .navbar-brand-text .kannada { font-size: 0.65rem; color: var(--primary); }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .btn:hover { border-color: var(--primary); color: var(--primary); }
+    .btn-primary {
+      background: #00B4FF;
+      color: #020B18;
+      border-color: #00B4FF;
+      box-shadow: 0 0 20px rgba(0, 180, 255, 0.4);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      color: #020B18;
+      border-color: var(--primary-hover);
+      box-shadow: 0 0 24px rgba(0, 180, 255, 0.5);
+    }
+
+    .download-hero {
+      padding: 3rem 1.5rem 2rem;
+      text-align: center;
+      max-width: 800px;
+      margin: 0 auto;
+    }
+    .download-hero h1 {
+      font-size: 2.25rem;
+      margin-bottom: 0.75rem;
+    }
+    .download-hero p {
+      color: var(--text-muted);
+      font-size: 1.05rem;
+    }
+
+    .download-content {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 0 1.5rem 4rem;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 3rem;
+      align-items: start;
+    }
+    @media (max-width: 768px) {
+      .download-content { grid-template-columns: 1fr; }
+    }
+
+    .download-left {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+    }
+    .download-left h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .qr-wrap {
+      text-align: center;
+      margin-bottom: 1.5rem;
+    }
+    .qr-wrap img {
+      width: 200px;
+      height: 200px;
+      border-radius: 8px;
+      border: 1px solid var(--border);
+    }
+    .download-left .or {
+      color: var(--text-muted);
+      font-size: 0.9rem;
+      margin: 1.25rem 0 0.75rem;
+    }
+    .tabs {
+      display: flex;
+      gap: 0;
+      margin-bottom: 1rem;
+    }
+    .tabs button {
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      font-size: 0.95rem;
+      font-weight: 500;
+      background: transparent;
+      color: var(--text-muted);
+      border: 1px solid var(--border);
+      cursor: pointer;
+      border-radius: 0;
+    }
+    .tabs button:first-child { border-radius: 8px 0 0 8px; }
+    .tabs button:last-child { border-radius: 0 8px 8px 0; }
+    .tabs button.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+    .download-btn-wrap {
+      text-align: center;
+    }
+    .download-btn-wrap .btn {
+      width: 100%;
+      padding: 1rem 1.5rem;
+      font-size: 1.1rem;
+      justify-content: center;
+    }
+
+    .download-right h2 {
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+    }
+    .feature-list {
+      list-style: none;
+    }
+    .feature-list li {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.75rem;
+      margin-bottom: 1rem;
+      padding: 0.75rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+    .feature-list .icon { font-size: 1.5rem; flex-shrink: 0; }
+    .feature-list strong { display: block; margin-bottom: 0.25rem; }
+    .feature-list span { color: var(--text-muted); font-size: 0.95rem; }
+
+    .how-section {
+      max-width: 800px;
+      margin: 0 auto;
+      padding: 3rem 1.5rem;
+    }
+    .how-section h2 {
+      text-align: center;
+      font-size: 1.5rem;
+      margin-bottom: 2rem;
+    }
+    .how-steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 1.5rem;
+      text-align: center;
+    }
+    @media (max-width: 600px) { .how-steps { grid-template-columns: 1fr; } }
+    .how-steps .icon { font-size: 2.5rem; margin-bottom: 0.5rem; }
+    .how-steps h3 { font-size: 1rem; margin-bottom: 0.25rem; }
+    .how-steps p { color: var(--text-muted); font-size: 0.9rem; }
+
+    .credentials-box {
+      max-width: 500px;
+      margin: 2rem auto 4rem;
+      padding: 1.5rem 2rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+    }
+    .credentials-box h3 {
+      font-size: 1.1rem;
+      margin-bottom: 1rem;
+    }
+    .credentials-box p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+      margin-bottom: 0.5rem;
+    }
+    .credentials-box code {
+      background: var(--bg);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      font-size: 0.9rem;
+    }
+
+    footer {
+      background: #020B18;
+      border-top: 1px solid var(--border);
+      padding: 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="./index.html" class="navbar-brand">
+      <img src="./assets/logo.png" alt="VayuNetra">
+      <div class="navbar-brand-text">
+        <span class="name">VayuNetra</span>
+        <span class="kannada">ವಾಯು ನೇತ್ರ</span>
+      </div>
+    </a>
+    <a href="./index.html" class="btn">Back to Home</a>
+  </nav>
+
+  <div class="download-hero">
+    <h1>Download VayuNetra</h1>
+    <p>Help keep Bengaluru clean by reporting pollution from your mobile device</p>
+  </div>
+
+  <div class="download-content">
+    <div class="download-left">
+      <h2>Scan QR Code to Download</h2>
+      <p style="color: var(--text-muted); font-size: 0.95rem; margin-bottom: 1rem;">Use your phone's camera to scan this QR code for a direct download link</p>
+      <div class="qr-wrap">
+        <img src="https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=https%3A%2F%2Fdrive.google.com%2Fdrive%2Ffolders%2F1JoPXW6F7fMZSXXqlJu3tgGSdaOZl9RJu" alt="QR Code for VayuNetra download" width="200" height="200">
+      </div>
+      <p class="or">Or download directly</p>
+      <div class="tabs">
+        <button type="button" class="active" data-platform="android">Android</button>
+        <button type="button" data-platform="ios">iOS</button>
+      </div>
+      <div class="download-btn-wrap">
+        <a href="https://drive.google.com/drive/folders/1JoPXW6F7fMZSXXqlJu3tgGSdaOZl9RJu" target="_blank" rel="noopener" class="btn btn-primary">Download for Android</a>
+      </div>
+    </div>
+
+    <div class="download-right">
+      <h2>App Features</h2>
+      <ul class="feature-list">
+        <li>
+          <span class="icon">📷</span>
+          <div>
+            <strong>Easy Photo Reporting</strong>
+            <span>Take photos with automatic GPS location tagging</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">🗺️</span>
+          <div>
+            <strong>Interactive Map</strong>
+            <span>View pollution hotspots across Bengaluru</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">🤖</span>
+          <div>
+            <strong>AI-Powered Analysis</strong>
+            <span>Nova 2 Lite detects pollution type and severity</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">🎙️</span>
+          <div>
+            <strong>Voice Reporting</strong>
+            <span>Report in Kannada, Hindi, or English</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">📄</span>
+          <div>
+            <strong>Auto Complaint Letter</strong>
+            <span>Generates legal letter to KSPCB & BBMP</span>
+          </div>
+        </li>
+        <li>
+          <span class="icon">🏆</span>
+          <div>
+            <strong>Earn Badges</strong>
+            <span>Bronze Guardian to Legend of Bengaluru</span>
+          </div>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <section class="how-section">
+    <h2>How It Works</h2>
+    <div class="how-steps">
+      <div>
+        <div class="icon">📷</div>
+        <h3>Take a Photo</h3>
+        <p>Photograph any pollution you see</p>
+      </div>
+      <div>
+        <div class="icon">🤖</div>
+        <h3>Nova AI Analyzes</h3>
+        <p>Get instant severity + health risk assessment</p>
+      </div>
+      <div>
+        <div class="icon">📄</div>
+        <h3>Auto-File Complaint</h3>
+        <p>Letter sent to KSPCB & BBMP automatically</p>
+      </div>
+    </div>
+  </section>
+
+  <div class="credentials-box">
+    <h3>Test Credentials</h3>
+    <p>Email: <code>test@vayunetra.com</code></p>
+    <p>Password: <code>Test@1234</code></p>
+  </div>
+
+  <footer>
+    <p>Built with ❤️ for Bengaluru | Amazon Nova AI Hackathon 2026</p>
+    <p>Powered by Amazon Nova AI</p>
+  </footer>
+
+  <script>
+    (function() {
+      document.querySelectorAll('.tabs button').forEach(function(btn) {
+        btn.addEventListener('click', function() {
+          document.querySelectorAll('.tabs button').forEach(b => b.classList.remove('active'));
+          this.classList.add('active');
+          const link = document.querySelector('.download-btn-wrap .btn');
+          if (this.dataset.platform === 'android') {
+            link.href = 'https://drive.google.com/drive/folders/1JoPXW6F7fMZSXXqlJu3tgGSdaOZl9RJu';
+            link.textContent = 'Download for Android';
+          } else {
+            link.href = '#';
+            link.textContent = 'Coming soon for iOS';
+          }
+        });
+      });
+    })();
+  </script>
+</body>
+</html>

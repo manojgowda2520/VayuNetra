@@ -1,0 +1,884 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" href="./assets/logo.png" type="image/png">
+  <title>VayuNetra (ವಾಯು ನೇತ್ರ) – Report Pollution. Protect Bengaluru.</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <script src="https://maps.googleapis.com/maps/api/js?key=AIzaSyDCKFPbn0coqQb6kkjJqSVk1TsVh1Mh7hg&callback=initMap" async defer></script>
+  <style>
+    :root {
+      --primary: #00B4FF;
+      --primary-hover: #0091CC;
+      --secondary: #1565C0;
+      --bg: #020B18;
+      --card-bg: #0A1628;
+      --text: #E0F7FA;
+      --text-muted: #81D4FA;
+      --border: rgba(0, 180, 255, 0.15);
+      --navbar-bg: rgba(2, 11, 24, 0.92);
+      --success: #00E676;
+      --glow: rgba(0, 180, 255, 0.4);
+    }
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+    html {
+      scroll-behavior: smooth;
+    }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      overflow-x: hidden;
+    }
+    a {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    a:hover {
+      text-decoration: underline;
+    }
+
+    /* Navbar */
+    .navbar {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      z-index: 1000;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 0.75rem 1.5rem;
+      background: var(--navbar-bg);
+      backdrop-filter: blur(10px);
+      border-bottom: 1px solid var(--border);
+    }
+    .navbar-brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+    .navbar-brand img {
+      height: 40px;
+      width: auto;
+    }
+    .navbar-brand-text {
+      display: flex;
+      flex-direction: column;
+    }
+    .navbar-brand-text .name {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--text);
+    }
+    .navbar-brand-text .kannada {
+      font-size: 0.7rem;
+      color: var(--primary);
+    }
+    .navbar-links {
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    .navbar-links a {
+      color: var(--text);
+      text-decoration: none;
+      font-weight: 500;
+      font-size: 0.95rem;
+    }
+    .navbar-links a:hover {
+      color: var(--primary);
+      text-decoration: none;
+    }
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 1rem;
+      font-family: inherit;
+      font-weight: 600;
+      font-size: 0.9rem;
+      border-radius: 8px;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+    }
+    .btn-primary {
+      background: #00B4FF;
+      color: #020B18;
+      box-shadow: 0 0 20px rgba(0, 180, 255, 0.4);
+    }
+    .btn-primary:hover {
+      background: var(--primary-hover);
+      transform: translateY(-1px);
+      box-shadow: 0 0 24px rgba(0, 180, 255, 0.5);
+    }
+    .btn-outline {
+      background: transparent;
+      color: var(--text);
+      border: 2px solid var(--border);
+    }
+    .btn-outline:hover {
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+    .navbar-menu-btn {
+      display: none;
+      background: none;
+      border: none;
+      color: var(--text);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    /* Hero */
+    .hero {
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      padding: 6rem 1.5rem 4rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      gap: 3rem;
+      background: linear-gradient(135deg, #020B18 0%, #0A1628 100%);
+    }
+    .hero-content {
+      flex: 1;
+    }
+    .hero-badge {
+      display: inline-block;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      padding: 0.4rem 0.8rem;
+      border-radius: 999px;
+      font-size: 0.85rem;
+      margin-bottom: 1rem;
+    }
+    .hero h1 {
+      font-size: clamp(2.5rem, 5vw, 3.5rem);
+      font-weight: 700;
+      line-height: 1.15;
+      margin-bottom: 0.5rem;
+    }
+    .hero h1 .green {
+      color: #00B4FF;
+    }
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1.1rem;
+      max-width: 520px;
+      margin-bottom: 1.5rem;
+    }
+    .hero-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.75rem;
+      margin-bottom: 2rem;
+    }
+    .hero-buttons .btn {
+      padding: 0.75rem 1.25rem;
+    }
+    .stats-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1rem 1.25rem;
+      max-width: 420px;
+    }
+    .stats-card-header {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      margin-bottom: 0.75rem;
+    }
+    .live-badge {
+      background: #00E676;
+      color: #020B18;
+      font-size: 0.7rem;
+      font-weight: 600;
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+    }
+    .stats-card-header .dot {
+      width: 6px;
+      height: 6px;
+      background: #00E676;
+      border-radius: 50%;
+      animation: pulse 1.5s infinite;
+    }
+    @keyframes pulse {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.4; }
+    }
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 0.75rem;
+      text-align: center;
+    }
+    .stats-grid .value {
+      font-weight: 700;
+      font-size: 1.25rem;
+      color: var(--primary);
+    }
+    .stats-grid .label {
+      font-size: 0.7rem;
+      color: var(--text-muted);
+    }
+    .hero-visual {
+      flex: 0 0 320px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-visual img {
+      max-width: 280px;
+      width: 100%;
+      animation: float 4s ease-in-out infinite;
+    }
+    @keyframes float {
+      0%, 100% { transform: translateY(0); }
+      50% { transform: translateY(-15px); }
+    }
+
+    /* Sections common */
+    section {
+      padding: 4rem 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      background: #020B18;
+    }
+    section:nth-of-type(odd) {
+      background: #0A1628;
+    }
+    .section-title {
+      text-align: center;
+      margin-bottom: 0.5rem;
+    }
+    .section-title h2 {
+      font-size: 2rem;
+      font-weight: 700;
+    }
+    .section-subtitle {
+      text-align: center;
+      color: var(--text-muted);
+      margin-bottom: 2.5rem;
+    }
+
+    /* Features */
+    .features-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+      gap: 1.5rem;
+    }
+    .feature-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      transition: border-color 0.2s;
+    }
+    .feature-card:hover {
+      border-color: var(--primary);
+    }
+    .feature-card .icon {
+      font-size: 2rem;
+      margin-bottom: 0.75rem;
+    }
+    .feature-card h3 {
+      font-size: 1.1rem;
+      margin-bottom: 0.5rem;
+    }
+    .feature-card p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* How it works */
+    .steps {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 2rem;
+      text-align: center;
+    }
+    .step {
+      padding: 1.5rem;
+    }
+    .step .icon {
+      font-size: 3rem;
+      margin-bottom: 1rem;
+    }
+    .step h3 {
+      font-size: 1.15rem;
+      margin-bottom: 0.5rem;
+    }
+    .step p {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    /* Map */
+    .map-section {
+      padding: 4rem 1.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+    .map-container {
+      position: relative;
+      border-radius: 12px;
+      overflow: hidden;
+      border: 1px solid var(--border);
+      height: 450px;
+      background: var(--card-bg);
+    }
+    #map {
+      width: 100%;
+      height: 100%;
+      min-height: 450px;
+    }
+    .map-overlay {
+      position: absolute;
+      bottom: 1rem;
+      left: 1rem;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 1rem;
+      z-index: 500;
+    }
+    .map-overlay h4 {
+      font-size: 0.9rem;
+      margin-bottom: 0.5rem;
+    }
+    .map-overlay .count {
+      font-weight: 700;
+      color: var(--primary);
+    }
+
+    /* Impact */
+    .impact-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 1.5rem;
+    }
+    .impact-card {
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      text-align: center;
+    }
+    .impact-card .icon {
+      font-size: 2rem;
+      margin-bottom: 0.5rem;
+    }
+    .impact-card .value {
+      font-weight: 700;
+      font-size: 1.5rem;
+      color: var(--primary);
+    }
+    .impact-card .label {
+      font-size: 0.9rem;
+      color: var(--text-muted);
+    }
+
+    /* Leaderboard */
+    .leaderboard-list {
+      max-width: 500px;
+      margin: 0 auto;
+      background: var(--card-bg);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .leaderboard-item {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      padding: 1rem 1.25rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .leaderboard-item:last-child {
+      border-bottom: none;
+    }
+    .leaderboard-rank {
+      font-weight: 700;
+      color: var(--text-muted);
+      min-width: 1.5rem;
+    }
+    .leaderboard-item .badge {
+      font-size: 1.5rem;
+    }
+    .leaderboard-item .name {
+      flex: 1;
+      font-weight: 500;
+    }
+    .leaderboard-item .points {
+      font-weight: 700;
+      color: var(--primary);
+    }
+    .leaderboard-loading, .leaderboard-empty {
+      padding: 2rem;
+      text-align: center;
+      color: var(--text-muted);
+    }
+
+    /* Download CTA */
+    .download-cta {
+      text-align: center;
+      padding: 4rem 1.5rem;
+    }
+    .download-cta .btn {
+      padding: 1rem 2rem;
+      font-size: 1.1rem;
+    }
+
+    /* Footer */
+    footer {
+      background: #020B18;
+      border-top: 1px solid var(--border);
+      padding: 2rem 1.5rem;
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.9rem;
+    }
+    footer .links {
+      margin-top: 0.75rem;
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    footer .links a {
+      color: var(--text-muted);
+    }
+    footer .links a:hover {
+      color: var(--primary);
+    }
+
+    /* Loading */
+    .loading {
+      opacity: 0.6;
+      pointer-events: none;
+    }
+    .skeleton {
+      background: linear-gradient(90deg, var(--border) 25%, var(--card-bg) 50%, var(--border) 75%);
+      background-size: 200% 100%;
+      animation: skeleton 1.2s ease-in-out infinite;
+      border-radius: 4px;
+    }
+    @keyframes skeleton {
+      0% { background-position: 200% 0; }
+      100% { background-position: -200% 0; }
+    }
+
+    /* Mobile */
+    @media (max-width: 768px) {
+      .navbar-links {
+        display: none;
+      }
+      .navbar-menu-btn {
+        display: block;
+      }
+      .hero {
+        flex-direction: column;
+        padding-top: 5rem;
+        text-align: center;
+      }
+      .hero p {
+        margin-left: auto;
+        margin-right: auto;
+      }
+      .hero-buttons {
+        justify-content: center;
+      }
+      .stats-card {
+        margin: 0 auto;
+      }
+      .stats-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .hero-visual {
+        flex: none;
+      }
+      .steps {
+        grid-template-columns: 1fr;
+      }
+      .impact-grid {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+    @media (max-width: 480px) {
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      .impact-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <nav class="navbar">
+    <a href="./index.html" class="navbar-brand">
+      <img src="./assets/logo.png" alt="VayuNetra">
+      <div class="navbar-brand-text">
+        <span class="name">VayuNetra</span>
+        <span class="kannada">ವಾಯು ನೇತ್ರ</span>
+      </div>
+    </a>
+    <div class="navbar-links">
+      <a href="#features">Features</a>
+      <a href="#live-map">Live Map</a>
+      <a href="https://dashboard.vayunetra.com" target="_blank" rel="noopener">Dashboard</a>
+      <a href="./download.html" class="btn btn-primary">Download App</a>
+    </div>
+    <button class="navbar-menu-btn" id="menuBtn" aria-label="Menu">☰</button>
+  </nav>
+
+  <header class="hero">
+    <div class="hero-content">
+      <div class="hero-badge">🏆 Amazon Nova AI Hackathon 2026</div>
+      <h1>Make Bengaluru</h1>
+      <h1 class="green">Breathe Clean</h1>
+      <p>AI-powered air pollution monitoring connecting citizens, authorities, and technology to combat pollution challenges in Bengaluru, India</p>
+      <div class="hero-buttons">
+        <a href="./download.html" class="btn btn-primary">📱 Download App</a>
+        <a href="#live-map" class="btn btn-outline">🗺 Live Map</a>
+        <a href="https://dashboard.vayunetra.com" target="_blank" rel="noopener" class="btn btn-outline">📊 Dashboard</a>
+      </div>
+      <div class="stats-card" id="statsCard">
+        <div class="stats-card-header">
+          <span class="dot"></span>
+          <span class="live-badge">● LIVE</span>
+        </div>
+        <div class="stats-grid" id="statsGrid">
+          <div><span class="value" data-stat="total">--</span><div class="label">Total Reports</div></div>
+          <div><span class="value" data-stat="today">--</span><div class="label">Today</div></div>
+          <div><span class="value" data-stat="critical">--</span><div class="label">Critical</div></div>
+          <div><span class="value" data-stat="areas">--</span><div class="label">Areas</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="hero-visual">
+      <img src="./assets/logo.png" alt="VayuNetra">
+    </div>
+  </header>
+
+  <section id="features">
+    <div class="section-title"><h2>Powerful Features</h2></div>
+    <p class="section-subtitle">Advanced AI technology for cleaner air</p>
+    <div class="features-grid">
+      <div class="feature-card">
+        <div class="icon">📸</div>
+        <h3>AI Photo Analysis</h3>
+        <p>Amazon Nova 2 Lite analyzes pollution photos with precision</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🎙️</div>
+        <h3>Voice Reporting</h3>
+        <p>Report in Kannada, Hindi, or English using Nova 2 Sonic voice AI</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🗺️</div>
+        <h3>Real-time Map</h3>
+        <p>Live pollution heatmap across Bengaluru wards</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">📄</div>
+        <h3>Auto Complaint Letter</h3>
+        <p>Instantly generates legal complaint to KSPCB and BBMP</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🤖</div>
+        <h3>AI Agent Chat</h3>
+        <p>Ask anything about Bengaluru air quality with multi-round tool calling</p>
+      </div>
+      <div class="feature-card">
+        <div class="icon">🏆</div>
+        <h3>Community Rewards</h3>
+        <p>Earn badges from Bronze Guardian to Legend of Bengaluru</p>
+      </div>
+    </div>
+  </section>
+
+  <section id="how-it-works">
+    <div class="section-title"><h2>How It Works</h2></div>
+    <p class="section-subtitle">Three simple steps to report and resolve pollution</p>
+    <div class="steps">
+      <div class="step">
+        <div class="icon">📷</div>
+        <h3>Take a Photo</h3>
+        <p>Photograph any pollution you see</p>
+      </div>
+      <div class="step">
+        <div class="icon">🤖</div>
+        <h3>Nova AI Analyzes</h3>
+        <p>Get instant severity + health risk assessment</p>
+      </div>
+      <div class="step">
+        <div class="icon">📄</div>
+        <h3>Auto-File Complaint</h3>
+        <p>Letter sent to KSPCB & BBMP automatically</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="map-section" id="live-map">
+    <div class="section-title"><h2>Live Pollution Map</h2></div>
+    <p class="section-subtitle">Real-time visualization of community reports</p>
+    <div class="map-container">
+      <div id="map"></div>
+      <div class="map-overlay">
+        <h4>Recent Activity</h4>
+        <span class="count" id="report-count">0</span> locations<br>
+        <small>Last updated: <span id="last-updated">--</span></small>
+      </div>
+    </div>
+  </section>
+
+  <section id="impact">
+    <div class="section-title"><h2>Our Impact</h2></div>
+    <p class="section-subtitle">Community-driven change across Bengaluru</p>
+    <div class="impact-grid" id="impactGrid">
+      <div class="impact-card">
+        <div class="icon">🔴</div>
+        <div class="value" data-impact="critical">0</div>
+        <div class="label">Critical Reports</div>
+      </div>
+      <div class="impact-card">
+        <div class="icon">📍</div>
+        <div class="value" data-impact="areas">0</div>
+        <div class="label">Areas Covered</div>
+      </div>
+      <div class="impact-card">
+        <div class="icon">👥</div>
+        <div class="value" data-impact="citizens">0</div>
+        <div class="label">Active Citizens</div>
+      </div>
+      <div class="impact-card">
+        <div class="icon">🏆</div>
+        <div class="value" data-impact="complaints">0</div>
+        <div class="label">Complaints Filed</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="leaderboard">
+    <div class="section-title"><h2>Top Vayu Warriors</h2></div>
+    <p class="section-subtitle">Community leaders making a difference</p>
+    <div class="leaderboard-list" id="leaderboardList">
+      <div class="leaderboard-loading" id="leaderboardLoading">Loading...</div>
+    </div>
+  </section>
+
+  <section class="download-cta">
+    <div class="section-title"><h2>Download VayuNetra</h2></div>
+    <p class="section-subtitle">Help keep Bengaluru clean</p>
+    <a href="./download.html" class="btn btn-primary">Download App</a>
+  </section>
+
+  <footer>
+    <p>Built with ❤️ for Bengaluru | Amazon Nova AI Hackathon 2026</p>
+    <p>Powered by Amazon Nova AI | api.vayunetra.com</p>
+    <div class="links">
+      <a href="https://github.com/manojgowda2520/VayuNetra" target="_blank" rel="noopener">GitHub</a>
+      <a href="https://docs.vayunetra.com/" target="_blank" rel="noopener">Docs</a>
+      <a href="https://dashboard.vayunetra.com" target="_blank" rel="noopener">Dashboard</a>
+      <a href="./download.html">Download</a>
+    </div>
+  </footer>
+
+  <script>
+    const API_BASE = 'https://api.vayunetra.com/api';
+
+    function getSeverityColor(severity) {
+      switch ((severity || '').toUpperCase()) {
+        case 'CRITICAL': return '#FF3D3D';
+        case 'HIGH': return '#FF9500';
+        case 'MODERATE': return '#FFC107';
+        case 'LOW': return '#00E676';
+        default: return '#00B4FF';
+      }
+    }
+
+    function getSeverityRadius(severity) {
+      switch ((severity || '').toUpperCase()) {
+        case 'CRITICAL': return 14;
+        case 'HIGH': return 12;
+        case 'MODERATE': return 10;
+        case 'LOW': return 8;
+        default: return 8;
+      }
+    }
+
+    let map;
+
+    window.initMap = function() {
+      const mapEl = document.getElementById('map');
+      if (!mapEl) return;
+      map = new google.maps.Map(mapEl, {
+        center: { lat: 12.9716, lng: 77.5946 },
+        zoom: 11,
+        mapTypeId: 'roadmap',
+        styles: [
+          { elementType: 'geometry', stylers: [{ color: '#0A1628' }] },
+          { elementType: 'labels.text.stroke', stylers: [{ color: '#020B18' }] },
+          { elementType: 'labels.text.fill', stylers: [{ color: '#6B8FAE' }] },
+          { featureType: 'road', elementType: 'geometry', stylers: [{ color: '#0D1F3C' }] },
+          { featureType: 'road', elementType: 'geometry.stroke', stylers: [{ color: '#020B18' }] },
+          { featureType: 'road', elementType: 'labels.text.fill', stylers: [{ color: '#6B8FAE' }] },
+          { featureType: 'water', elementType: 'geometry', stylers: [{ color: '#020B18' }] },
+          { featureType: 'water', elementType: 'labels.text.fill', stylers: [{ color: '#00B4FF' }] },
+          { featureType: 'poi', stylers: [{ visibility: 'off' }] },
+          { featureType: 'transit', stylers: [{ visibility: 'off' }] }
+        ]
+      });
+      fetchAndPlotReports();
+    };
+
+    async function fetchAndPlotReports() {
+      try {
+        const res = await fetch(API_BASE + '/reports');
+        const data = await res.json();
+        const reports = Array.isArray(data) ? data : (data.reports || data.data || []);
+
+        reports.forEach(function(report) {
+          const lat = report.latitude != null ? parseFloat(report.latitude) : parseFloat(report.lat);
+          const lng = report.longitude != null ? parseFloat(report.longitude) : parseFloat(report.lng || report.lon);
+          if (isNaN(lat) || isNaN(lng)) return;
+
+          const severity = report.analysis?.severity || report.severity || report.level || 'LOW';
+          const radius = getSeverityRadius(severity) * 50;
+          const color = getSeverityColor(severity);
+
+          new google.maps.Circle({
+            map: map,
+            center: { lat: lat, lng: lng },
+            radius: radius,
+            fillColor: color,
+            fillOpacity: 0.6,
+            strokeColor: color,
+            strokeOpacity: 1,
+            strokeWeight: 2
+          });
+
+          var infoWindow = new google.maps.InfoWindow({
+            content: '<div style="background:#0A1628;color:#E8F4FD;padding:12px;border-radius:8px;min-width:200px">' +
+              '<strong style="color:#00B4FF">' + (report.area || 'Unknown Area') + '</strong><br>' +
+              '<span style="color:' + getSeverityColor(severity) + '">● ' + (severity || 'UNKNOWN') + '</span><br>' +
+              '<small style="color:#6B8FAE">' + (report.analysis?.pollution_type || '') + '</small><br>' +
+              '<small style="color:#6B8FAE">' + (report.created_at ? new Date(report.created_at).toLocaleDateString('en-IN') : '') + '</small>' +
+              '</div>'
+          });
+
+          var clickMarker = new google.maps.Marker({
+            position: { lat: lat, lng: lng },
+            map: map,
+            icon: { path: google.maps.SymbolPath.CIRCLE, scale: 0 }
+          });
+          clickMarker.addListener('click', function() {
+            infoWindow.open(map, clickMarker);
+          });
+        });
+
+        var countEl = document.getElementById('report-count');
+        if (countEl) countEl.textContent = reports.length;
+        var updatedEl = document.getElementById('last-updated');
+        if (updatedEl) updatedEl.textContent = new Date().toLocaleTimeString('en-IN');
+      } catch (e) {
+        console.error('Map fetch error:', e);
+        var countEl = document.getElementById('report-count');
+        if (countEl) countEl.textContent = '0';
+        var updatedEl = document.getElementById('last-updated');
+        if (updatedEl) updatedEl.textContent = '--';
+      }
+    }
+
+    (function() {
+      function setStat(el, value) {
+        if (el) el.textContent = typeof value === 'number' ? value : (value ?? 0);
+      }
+
+      function setImpact(el, value) {
+        if (el) el.textContent = typeof value === 'number' ? value : (value ?? 0);
+      }
+
+      // Stats
+      fetch(API_BASE + '/stats').then(r => r.json()).then(data => {
+        const g = document.getElementById('statsGrid');
+        if (!g) return;
+        const total = g.querySelector('[data-stat="total"]');
+        const today = g.querySelector('[data-stat="today"]');
+        const critical = g.querySelector('[data-stat="critical"]');
+        const areas = g.querySelector('[data-stat="areas"]');
+        setStat(total, data.total_reports ?? data.total ?? 0);
+        setStat(today, data.today ?? data.reports_today ?? 0);
+        setStat(critical, data.critical ?? data.critical_reports ?? 0);
+        setStat(areas, data.areas ?? data.areas_covered ?? 0);
+      }).catch(() => {
+        const g = document.getElementById('statsGrid');
+        if (g) g.querySelectorAll('.value').forEach(el => setStat(el, 0));
+      });
+
+      // Impact (reuse stats or separate endpoint)
+      fetch(API_BASE + '/stats').then(r => r.json()).then(data => {
+        const g = document.getElementById('impactGrid');
+        if (!g) return;
+        const critical = g.querySelector('[data-impact="critical"]');
+        const areas = g.querySelector('[data-impact="areas"]');
+        const citizens = g.querySelector('[data-impact="citizens"]');
+        const complaints = g.querySelector('[data-impact="complaints"]');
+        setImpact(critical, data.critical ?? data.critical_reports ?? 0);
+        setImpact(areas, data.areas ?? data.areas_covered ?? 0);
+        setImpact(citizens, data.active_citizens ?? data.users ?? 0);
+        setImpact(complaints, data.complaints_filed ?? data.total_reports ?? 0);
+      }).catch(() => {
+        const g = document.getElementById('impactGrid');
+        if (g) g.querySelectorAll('[data-impact]').forEach(el => setImpact(el, 0));
+      });
+
+      // Leaderboard
+      const lbList = document.getElementById('leaderboardList');
+      const lbLoading = document.getElementById('leaderboardLoading');
+      fetch(API_BASE + '/leaderboard').then(r => r.json()).then(data => {
+        const list = Array.isArray(data) ? data : (data.leaderboard || data.users || data.data || []);
+        if (lbLoading) lbLoading.remove();
+        if (list.length === 0) {
+          lbList.innerHTML = '<div class="leaderboard-empty">No leaderboard data yet. Be the first!</div>';
+          return;
+        }
+        const top = list.slice(0, 5);
+        lbList.innerHTML = top.map((u, i) => `
+          <div class="leaderboard-item">
+            <span class="leaderboard-rank">${i + 1}</span>
+            <span class="badge">${u.badge || '🏅'}</span>
+            <span class="name">${u.name || u.username || u.email || 'Anonymous'}</span>
+            <span class="points">${u.points ?? u.score ?? 0} pts</span>
+          </div>
+        `).join('');
+      }).catch(() => {
+        if (lbLoading) lbLoading.remove();
+        lbList.innerHTML = '<div class="leaderboard-empty">Unable to load leaderboard.</div>';
+      });
+
+      // Mobile menu (optional)
+      const menuBtn = document.getElementById('menuBtn');
+      const navLinks = document.querySelector('.navbar-links');
+      if (menuBtn && navLinks) {
+        menuBtn.addEventListener('click', function() {
+          navLinks.style.display = navLinks.style.display === 'flex' ? 'none' : 'flex';
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
