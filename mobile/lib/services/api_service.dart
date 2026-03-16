@@ -174,6 +174,19 @@ class ApiService {
     }
   }
 
+  /// Live AQI from Google Air Quality API (via backend). Returns empty list on error so UI can fallback.
+  static Future<List<dynamic>> getCleanZonesLive() async {
+    try {
+      final r = await http.get(Uri.parse('$base/api/clean-zones/live'))
+          .timeout(const Duration(seconds: 30));
+      if (r.statusCode != 200) return [];
+      final b = jsonDecode(r.body);
+      return b is List ? b : [];
+    } catch (_) {
+      return [];
+    }
+  }
+
   // ── VOICE (Nova 2 Sonic) ──────────────────────────────────
   static Future<Map<String, dynamic>> transcribeVoice(
       String audioPath, String language) async {

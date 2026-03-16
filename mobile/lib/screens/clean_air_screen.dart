@@ -3,11 +3,42 @@ import 'package:url_launcher/url_launcher.dart';
 import '../config/theme.dart';
 import '../providers/language_provider.dart';
 import '../models/clean_zone.dart';
+import '../services/api_service.dart';
 import '../widgets/aqi_gauge.dart';
 import '../widgets/glass_card.dart';
 
-class CleanAirScreen extends StatelessWidget {
+class CleanAirScreen extends StatefulWidget {
   const CleanAirScreen({super.key});
+  @override
+  State<CleanAirScreen> createState() => _CleanAirScreenState();
+}
+
+class _CleanAirScreenState extends State<CleanAirScreen> {
+  List<CleanZone> _zones = [];
+  bool _loading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadLiveZones();
+  }
+
+  Future<void> _loadLiveZones() async {
+    setState(() => _loading = true);
+    try {
+      final list = await ApiService.getCleanZonesLive();
+      if (list.isNotEmpty && mounted) {
+        setState(() {
+          _zones = list.map((e) => CleanZone.fromJson(Map<String, dynamic>.from(e as Map))).toList();
+          _loading = false;
+        });
+      } else {
+        if (mounted) setState(() { _zones = CleanZone.fallback; _loading = false; });
+      }
+    } catch (_) {
+      if (mounted) setState(() { _zones = CleanZone.fallback; _loading = false; });
+    }
+  }
 
   Color _color(int aqi) {
     if (aqi <= 50)  return VNColors.green;
@@ -30,13 +61,21 @@ class CleanAirScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final zones = CleanZone.fallback;
+    final zones = _zones.isEmpty ? CleanZone.fallback : _zones;
     return Scaffold(
       backgroundColor: VNColors.bg,
       appBar: AppBar(backgroundColor: VNColors.bg,
         title: Text(context.t('findCleanAir'), style: const TextStyle(fontFamily: 'Rajdhani', fontSize: 20, color: VNColors.text)),
-        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: VNColors.text), onPressed: () => Navigator.pop(context))),
-      body: ListView(padding: const EdgeInsets.all(16), children: [
+        leading: IconButton(icon: const Icon(Icons.arrow_back_ios, color: VNColors.text), onPressed: () => Navigator.pop(context)),
+        actions: [
+          IconButton(
+            icon: _loading ? const SizedBox(width: 20, height: 20, child: CircularProgressIndicator(strokeWidth: 2, color: VNColors.cyan)) : const Icon(Icons.refresh, color: VNColors.cyan),
+            onPressed: _loading ? null : _loadLiveZones,
+          ),
+        ]),
+      body: _loading && _zones.isEmpty
+          ? const Center(child: CircularProgressIndicator(color: VNColors.cyan))
+          : ListView(padding: const EdgeInsets.all(16), children: [
         GlassCard(child: Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
           Text(context.t('aqiScale'), style: const TextStyle(fontFamily: 'Rajdhani', fontSize: 13, color: VNColors.muted, letterSpacing: 2)),
           const SizedBox(height: 8),

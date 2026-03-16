@@ -165,6 +165,16 @@ class CleanZoneOut(BaseModel):
     model_config = ConfigDict(from_attributes=True)
 
 
+class LiveCleanZoneOut(BaseModel):
+    """Clean zone with live AQI from Google Air Quality API (no id)."""
+    name: str
+    aqi: int
+    status: str
+    latitude: float
+    longitude: float
+    activities: List[str] = []
+
+
 class VoiceResponse(BaseModel):
     transcription: str
     language: str

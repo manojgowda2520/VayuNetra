@@ -36,6 +36,9 @@ class Settings(BaseSettings):
     # Database
     DATABASE_URL: str = "sqlite:///./vayunetra.db"
 
+    # Google Air Quality API (for Clean Air live AQI)
+    GOOGLE_AQI_API_KEY: str | None = None
+
     model_config = SettingsConfigDict(
         env_file=".env",
         env_file_encoding="utf-8",
@@ -139,6 +142,10 @@ class Settings(BaseSettings):
     @property
     def public_base_url(self) -> str | None:
         return self.PUBLIC_BASE_URL
+
+    @property
+    def google_aqi_api_key(self) -> str | None:
+        return self.GOOGLE_AQI_API_KEY
 
 
 settings = Settings()
